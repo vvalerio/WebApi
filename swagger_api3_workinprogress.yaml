@@ -1,0 +1,282 @@
+swagger: '2.0'
+info:
+  title: EPOS Web API
+  description: |
+    This is the first version of the EPOS set of APIs. This suite allows you to search for data and metadata, and then to download or process search results. 
+    
+      gui (test point)  
+      http://nodedev.bgs.ac.uk/epos/epos-gui/master/ 
+    
+      gui (webapi client)
+      http://epos.cineca.it/secondswagger/
+      Web Api Client, using hub.docker.com/u/epos/webapirelease
+    
+      server (webapi server) 
+      Web Api Server, generated for Spring Framework
+      EPOS ICT-C server input via RabbitMQ Module
+      http://epos.cineca.it/eposbackend
+    
+      Enjoy!
+
+    EPOS Web Api Team apis@lists.epos-ip.org
+    
+  version: 0.0.2
+host: epos.cineca.it
+basePath: /webapi
+
+
+# todo api security
+# https://app.swaggerhub.com/apis/andrejsim/oauth2app/1.0.0
+################################################################################
+#                                  Security                                    #
+################################################################################
+# securityDefinitions:
+#   oauth:
+#     type: oauth2
+#     flow: implicit
+#     authorizationUrl: https://twitter.com/oauth/authorize/?client_id=CLIENT-ID&redirect_uri=REDIRECT-URI&response_type=token
+#     scopes:
+#       basic: |
+#       to read any and all data related to twitter
+# security:
+#   - oauth:
+#     - basic
+
+paths:
+
+#/aaai/
+# todo logging and user management protocol
+#/aaai/signin
+  /aaai/:
+    get:
+      description: Authenticate current user for api services
+    
+      responses:
+        '200':
+          description: ok response (demo delivery)    
+  
+  #  parameters:
+  #    name: username
+  #    
+  #    name: password
+  
+  #/aaai/management
+  
+  
+  /sources/:
+  
+  # gui: search component
+  #   Theis elmen is called by the search-box in the test gui 
+  #      TODO discuss features with GUI Team
+  #   The client requests all search requests from the DB Querry component.
+  # 
+    get:
+      description:
+        The sources endpoint returns all the metadata elements. The search function queries the Cerif catalog. Provides a list of resource items from the DDSS.
+      responses:
+        '200':
+          description: ok response (demo delivery)
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+
+    parameters:
+      - name: spatial
+        in: query
+        required: false
+        type: string
+        format: string
+        description: spatial bounding coordinates, geographic bbox
+        
+      - name: time
+        in: query
+        required: false
+        type: string
+        format: string
+        description: Time interval, temporal bounding of the search. Start and End Time.
+        
+      - name: domain
+        in: query
+        required: false
+        type: string
+        format: string
+        description: domain search; list of the work package domains specific to EPOS.
+        
+      - name: keywords
+        in: query
+        required: false
+        type: string
+        format: string
+        description: keywords
+        
+      - name: freetext
+        in: query
+        required: false
+        type: string
+        format: string
+        description: free text search
+      
+  /workspace/{id}:
+    parameters:
+      - name: id
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workspace to delete    
+  
+  /workspace/create:
+    post:
+      description:
+        This endpoint creates a new workspace for the logged user
+      responses:
+        '200':
+          description:
+            ok response
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+
+  /workspace/delete:
+    post:
+      description:
+        This endpoint deletes an existing workspace for the logged user
+      responses:
+        '200':
+          description:
+            ok response
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+
+    parameters:
+      - name: id
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workspace to delete
+
+  /workspaceobj/wfiadd:
+    post:
+      description:
+        This endpoint adds an item to an existing workspace
+      responses:
+        '200':
+          description:
+            ok response
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+    parameters:
+      - name: wsid
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workspace to add the item to
+      - name: wfiid
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workflow item
+
+  /workspaceobj/wfiremove:
+    post:
+      description:
+        This endpoint removes an item from an existing workspace
+      responses:
+        '200':
+          description:
+            ok response
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+    parameters:
+      - name: wsid
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workspace to remove the item from
+      - name: wfiid
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of workflow item
+
+  /process:
+    post:
+      description:
+        This endpoint processes a workflow item
+      responses:
+        '200':
+          description:
+            ok response
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+
+    parameters:
+      - name: id
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of item to process
+
+  /workflow:
+    get:
+      description:
+        Requests for data from the Common Workflow Language engine within the ICS-C.
+      responses:
+        '200':
+          description: ok response (under development)
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+    post:
+      description:
+        This endpoint interacts with Common Workflow Language engine within the ICS-C.
+      responses:
+        '200':
+          description: ok response (under development)
+        "403":
+          description: Error
+        default:
+          description: unexpected error
+
+    parameters:
+      - name: id
+        in: header
+        required: true
+        type: string
+        format: string
+        description: id of item to export
+        
+  # todo Discuss and expand
+  /metadata: 
+    # csw, inspire, rdf, skos, prov-dm, w3c linked data, etc
+    get:
+      description: Exports catalog, traceability information and provenance of data and serveices from EPOS
+      responses:
+        '200':
+          description: ok response (under development)
+
+  # todo Discuss and expand
+  /services: 
+    # epos specific interface for DDSS web services
+    get:
+      description: Exports catalog, traceability information and provenance of data and serveices from EPOS
+      responses:
+        '200':
+          description: ok response (under development)
